@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your title</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #17181b;
+        }
+        canvas {
+            border: 2px solid #333;
+            cursor: pointer; 
+        }
+        input {
+            margin-top: 20px;
+            padding: 10px;
+            width: 300px;
+            font-size: 16px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body>
+<h1 class="text-3xl py-10 pl-4 font-bold" style="color:rgba(226, 220, 220, 0.945)">
+    Что? Где? Когда?
+</h1>
+<canvas class ="rounded-4xl" id="arrowCanvas" width="400" height="400" onclick=playAudio()></canvas>
+<input class="rounded-4xl bg-white-100 focus:border-blue-500 text-white-700"type="text" id="wordsInput" placeholder="Введите слова через запятую" />
+
+<script>
+    function getBlackColorHSL() {
+  const h = 210; 
+  const s = 10; 
+  const l = 20; 
+  return `hsl(${h}, ${s}%, ${l}%)`; 
+}
+    const canvas = document.getElementById('arrowCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let angle = 0; 
+    let isRotating = false; 
+    let rotationSpeed = 0; 
+    let words = []; 
+
+    function drawArrow() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height); 
+
+        
+        drawCircleWithSectors();
+
+        ctx.save();
+        ctx.translate(canvas.width / 2, canvas.height / 2); 
+        ctx.rotate(angle); 
+        
+        ctx.beginPath();
+        ctx.moveTo(0, -100); 
+        ctx.lineTo(-10, -80); 
+        ctx.lineTo(10, -80); 
+        ctx.closePath();
+        ctx.fillStyle = 'red';
+        ctx.fill();
+
+        ctx.restore(); 
+
+        if (isRotating) {
+            angle += (rotationSpeed * Math.PI / 180)*(Math.random() * 2 * Math.PI); 
+            rotationSpeed *= 0.97; 
+            if (rotationSpeed < 0.7) { 
+                rotationSpeed = 0;
+            }
+            requestAnimationFrame(drawArrow); 
+        }
+    }
+    function playAudio() {
+  var audio = document.getElementById("myAudio");
+  audio.currentTime = 0; 
+  audio.play();
+}
+
+    function drawCircleWithSectors() {
+        const sectorCount = words.length;
+        const radius = 100;
+
+        if (sectorCount > 0) {
+            const angleStep = (2 * Math.PI) / sectorCount; 
+            for (let i = 0; i < sectorCount; i++) {
+                const startAngle = i * angleStep;
+                const endAngle = (i + 1) * angleStep;
+
+                ctx.beginPath();
+                ctx.moveTo(canvas.width / 2, canvas.height / 2);
+                ctx.arc(canvas.width / 2, canvas.height / 2, radius, startAngle, endAngle);
+                ctx.closePath();
+                
+                
+                ctx.fillStyle = getBlackColorHSL(); 
+                ctx.fill();
+                
+                ctx.save();
+                ctx.translate(canvas.width / 2, canvas.height / 2);
+                ctx.rotate(startAngle + angleStep / 2); 
+                ctx.fillStyle = 'white';
+                ctx.fillText(words[i], radius / 2, 10); 
+                ctx.restore();
+            }
+        }
+    }
+
+    document.getElementById('wordsInput').addEventListener('input', (event) => {
+        words = event.target.value.split(',').map(word => word.trim()).filter(word => word); // Разделение слов и удаление пробелов
+        drawCircleWithSectors(); 
+    });
+    canvas.addEventListener('click', () => {
+        if (!isRotating) {
+            isRotating = true; 
+            rotationSpeed = 10000; 
+            drawArrow(); 
+        }
+    });
+
+</script>
+
+</body>
+</html>
