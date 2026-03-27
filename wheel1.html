@@ -113,8 +113,7 @@
     }
 
     document.getElementById('wordsInput').addEventListener('input', (event) => {
-        words = event.target.value.split(',').map(word => word.trim()).filter(word => word); // Разделение слов и удаление пробелов
-        drawCircleWithSectors(); 
+        words = event.target.value.split(',').map(word => word.trim()).filter(word => word); 
     });
     canvas.addEventListener('click', () => {
         if (!isRotating) {
